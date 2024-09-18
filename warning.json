@@ -1,0 +1,107 @@
+[
+    {
+        "No": 1,
+        "Local": "toilet3",
+        "From": "001",
+        "Time": "7:09PM",
+        "Date": "18/09/2006"
+    },
+    {
+        "No": 2,
+        "Local": "toilet3",
+        "From": "001",
+        "Time": "7:09PM",
+        "Date": "18/09/2006"
+    },
+    {
+        "No": 3,
+        "Local": "toilet3",
+        "From": "001",
+        "Time": "7:09PM",
+        "Date": "18/09/2006"
+    },
+    {
+        "No": 4,
+        "Local": "toilet3",
+        "From": "001",
+        "Time": "7:09PM",
+        "Date": "18/09/2006"
+    },
+    {
+        "No": 5,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "",
+        "Date": ""
+    },
+    {
+        "No": 6,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "",
+        "Date": ""
+    },
+    {
+        "No": 7,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "21-55-54",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 8,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "21-56-40",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 9,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "21-56-51",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 10,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "21-57-45",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 11,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "21-57-58",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 12,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "22-05-37",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 13,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "22-06-07",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 14,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "22-12-08",
+        "Date": "2024-09-18"
+    },
+    {
+        "No": 15,
+        "Local": "toilet1",
+        "From": 1,
+        "Time": "22-12-21",
+        "Date": "2024-09-18"
+    }
+]

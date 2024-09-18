@@ -1,12 +1,15 @@
 import requests
 
-url = 'http://192.168.23.149:8080/'
+url = 'http://192.168.10.129:8080/Warning'
 data = {
-    'Id': 'value1',
-    'W': 'value2'
+    'No': '',
+    'Local': 'toilet3',
+    'From' : '001',
+    'Time' : '7:09PM',
+    'Date' : '18/09/2006'
 }
 
-response = requests.post(url, data=data)  # For JSON data
+response = requests.post(url, json=data)  # For JSON data
 # Or use `data=data` for form-encoded data (application/x-www-form-urlencoded)
 
 print(response.status_code)

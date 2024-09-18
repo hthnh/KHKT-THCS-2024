@@ -1,16 +1,21 @@
 #include <WiFiS3.h>
 #include "ArduinoGraphics.h"
 #include "Arduino_LED_Matrix.h"
+#include "ArduinoJson.h"
 
-#define ssid "hth1"
-#define pass "haithinh"
+#define ssid "hthnh"
+#define pass "hthnh123"
 
 const char* host = "192.168.10.129";
-IPAddress server(192,168,23,149);
-IPAddress local_IP(192,168,23,80);
-IPAddress gateway(192,168,23,1);
+IPAddress server(192,168,10,129);
+IPAddress local_IP(192,168,10,80);
+IPAddress gateway(192,168,10,1);
 IPAddress subnet(255,255,255,0);
 int status = WL_IDLE_STATUS;
+int id;
+String local;
+int sensor_A = A5;
+int warnPoint = 30;
 
 
 ArduinoLEDMatrix matrix;
@@ -56,8 +61,68 @@ void setup(){
 
   Serial.println("\n Connected");
   printLedMatrix("    Connected");
+  
+  delay(2000);
+
+  printLedMatrix("   Register Sensor");
+  if(client.connect(server,8080)){
+    Serial.println("Register start");
+    client.println("GET /ArClients/ip/" + local_IP.toString() + " HTTP/1.1");
+    client.println("");
+    client.println("Connection: close");
+  }else{
+    printLedMatrix(" error");
+    Serial.println("error get reg");
+    while(true);
+  }
+
+  if(resp_code() == 404){
+    printLedMatrix(" error");
+    Serial.println(" New Register");
+    while(true);
+  }
 
 
+  // Wait for the server to respond
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line == "\r") {
+      break;
+    }
+  }
+
+  // Read the response body
+  String response = "";
+  while (client.available()) {
+    response += client.readString();
+  }
+
+  DynamicJsonDocument doc(1024);  // Adjust the size based on your expected JSON size
+  DeserializationError error = deserializeJson(doc, response);
+
+  if (error) {
+    Serial.print("Failed to parse JSON: ");
+    Serial.println(error.c_str());
+  }
+
+  id = doc["id"];
+  local = doc["local"].as<String>();
+
+  client.stop();
+}
+
+
+int resp_code(){
+  while (client.connected() || client.available()) {
+    String line = client.readStringUntil('\n');
+    if (line.startsWith("HTTP/1.1") || line.startsWith("HTTP/1.0")) {
+      // Extract the response code from the status line
+      int responseCode = line.substring(9, 12).toInt();
+      return responseCode;
+      break;
+    }
+  }
+  return 404;
 }
 
 void printLedMatrix(String text){
@@ -97,31 +162,50 @@ void printWifiStatus() {
 
 
 
-void get_data(){
-  printLedMatrix("   Register Sensor");
-  if(client.connect(server,8080))
-  Serial.println("connected get value");
-  client.println("GET / HTTP/1.1");
-  client.println("");
-  client.println("Connection: close");
+// void get_data(){
+//   printLedMatrix("   Register Sensor");
+//   if(client.connect(server,8080))
+//   Serial.println("connected get value");
+//   client.println("GET / HTTP/1.1");
+//   client.println("");
+//   client.println("Connection: close");
 
-}
+// }
 
-void post_value(){
+void post_warning(){
   if(client.connect(server,8080))
   Serial.println("connected post value");
   // Prepare HTTP POST request
-  String url = "/";
-  String data = "id-sensor=1&values-sensor=200";
+  String url = "/Warning";
+  String data = "{\"No\":\"\",\"Local\":\""+ local +"\",\"From\":"+ id +", \"Time\":\"\", \"Date\":\"\"}";
 
-  // Build the HTTP POST request
-  client.print(String("POST ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
-               "Content-Type: application/x-www-form-urlencoded\r\n" +
-               "Content-Length: " + data.length() + "\r\n" +
-               "Connection: close\r\n\r\n" +
-               data + "\r\n");
+  DynamicJsonDocument jsonDoc(1024);  // Adjust size as needed
+  jsonDoc["No"] = "";  // Replace with your data
+  jsonDoc["Local"] = local;       // Replace with your data
+  jsonDoc["From"] = id;       // Replace with your data
+  jsonDoc["Time"] = "";       // Replace with your data
+  jsonDoc["Date"] = "";       // Replace with your data
+  String jsonString;
+  serializeJson(jsonDoc, jsonString);
+
+  // // Build the HTTP POST request
+  // client.print(String("POST ") + url + " HTTP/1.1\r\n" +
+  //              "Host: " + host + "\r\n" +
+  //              "Content-Type: application/x-www-form-urlencoded\r\n" +
+  //              "Content-Length: " + data.length() + "\r\n" +
+  //              "Connection: close\r\n\r\n" +
+  //              data + "\r\n");
   
+
+  client.println("POST /Warning HTTP/1.1");
+  client.println("Host: http://192.168.10.129:8080");
+  client.println("Content-Type: application/json");
+  client.println("Content-Length: " + String(jsonString.length()));
+  client.println(); 
+  client.println(jsonString);  // Send JSON data
+  client.println("Connection: close");
+
+
 
 }
 
@@ -147,16 +231,31 @@ void read_response() {
 
 void loop() {
 
-  
+  int value = analogRead(sensor_A);
+  while(value > warnPoint){
+    post_warning();
+    if(resp_code() == 201) break;
+    else {
+      Serial.println("Post error");
+      printLedMatrix("   error");
+    }
+    
+  }
 
+  // delay(10000);
 
-  // // if the server's disconnected, stop the client:
-  // if (!client.connected()) {
-  //   Serial.println();
-  //   Serial.println("disconnecting from server.");
-  //   client.stop();
+  // while(true){
+  //   post_warning();
+  //   Serial.println(resp_code());
+  //   if(resp_code() == 201) break;
+  //   else {
+  //     Serial.println("Post error");
+  //     printLedMatrix("   error");
 
-  //   // do nothing forevermore:
-  //   while (true);
+  //   }
+    
   // }
+
+
+  
 }
