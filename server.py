@@ -36,10 +36,10 @@ def record_video(record_duration=10):
         current_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         folder_name = f'video_recordings/{current_time}'
         os.makedirs(folder_name, exist_ok=True)
-
         video_filename = os.path.join(folder_name, 'output_video.mp4')
 
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(0, cv2.CAP_ANY)
+
 
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for .avi format
         fps = 20.0  # Frames per second
@@ -54,14 +54,15 @@ def record_video(record_duration=10):
         start_time = time.time()
         print(f"Recording started for {record_duration} seconds. Saving to folder: {folder_name}")
 
+        cv2.startWindowThread()
+        # cv2.namedWindow('Recording...', cv2.WINDOW_NORMAL)
+
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
-
             out.write(frame)
             cv2.imshow('Recording...', frame)
-
             elapsed_time = time.time() - start_time
             if elapsed_time > record_duration:
                 print(f"Recording finished after {record_duration} seconds.")
@@ -75,13 +76,15 @@ def record_video(record_duration=10):
         print(f"An error occurred: {e}")
 
     finally:
-        if 'cap' in locals() and cap.isOpened():
+        # Ensure that resources are released even in case of an error
+        if cap is not None and cap.isOpened():
             cap.release()
-        if 'out' in locals():
+            print("Video capture released.")
+        if out is not None:
             out.release()
+            print("Video writer released.")
         cv2.destroyAllWindows()
         print(f"Recording saved to {video_filename}")
-
 
 
 
@@ -140,6 +143,14 @@ def create_ArClient():
 
     return '', 201, {'location': f'/ArClients/{ArClient["id"]}'}
 
+
+@app.route('/Warning', methods=['GET'])
+def get_Warning():
+    return jsonify(WarFile)
+
+
+
+
 @app.route('/Warning', methods=['POST'])
 def start():
     Warn = json.loads(request.data)
@@ -147,8 +158,8 @@ def start():
         return jsonify({'error': 'Invalid ArClient properties.'}), 400
     global nextWarnNo
     Warn['No'] = nextWarnNo
-    Warn['Time'] = datetime.now().strftime('%H-%M-%S')
-    Warn['Date'] = datetime.now().strftime('%Y-%m-%d')
+    Warn['Time'] = datetime.now().strftime('%H:%M:%Ss')
+    Warn['Date'] = datetime.now().strftime('%d-%m-%Y')
     nextWarnNo+=1
     WarFile.append(Warn)
     save_data(WarningHistory_file,WarFile)
