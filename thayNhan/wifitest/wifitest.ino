@@ -15,6 +15,7 @@ int status = WL_IDLE_STATUS;
 int id;
 String local;
 int sensor_A = A5;
+int sensor_B = A4;
 int warnPoint = 45;
 
 
