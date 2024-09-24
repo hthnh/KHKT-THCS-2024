@@ -4,9 +4,12 @@ import cv2
 import os
 from datetime import datetime
 import time
+from telegram import Bot
 
-
+Token_bot = "7284069938:AAEzY6BpHskyexgtlpmCCW1BZQR7SPl7FEg"
+Chat_id = "6776867686"
 app = Flask(__name__)
+bot = Bot(token=Token_bot)
 
 Client_data_file = 'clients.json'
 WarningHistory_file = "warning.json"
@@ -28,6 +31,10 @@ WarFile = load_data(WarningHistory_file)
 nextArClientId = max(client['id'] for client in ArClients) + 1 if ArClients else 1
 nextWarnNo = max(client['No'] for client in WarFile) + 1 if WarFile else 1
 
+
+def send_message(chat){
+    bot.send_message(chat_id=Chat_id, text = chat)
+}
 
 def record_video(record_duration):
     cap = None
@@ -163,6 +170,7 @@ def start():
     nextWarnNo+=1
     WarFile.append(Warn)
     save_data(WarningHistory_file,WarFile)
+    send_message("Phat hien hut thuoc tai phong: " + Warn['Local'])
     record_video(record_duration=10)
     return '', 201, {'location': f'/WarFile/{Warn["No"]}'}
 
