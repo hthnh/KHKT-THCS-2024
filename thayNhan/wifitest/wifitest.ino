@@ -6,7 +6,7 @@
 #define ssid "hth"
 #define pass "haithinh"
 
-const char* host = "192.168.1.2";
+const char* host = "http://192.168.1.2:8080";
 IPAddress server(192,168,1,2);
 IPAddress local_IP(192,168,1,80);
 IPAddress gateway(192,168,1,1);
@@ -198,7 +198,7 @@ void post_warning(){
   
 
   client.println("POST /Warning HTTP/1.1");
-  client.println("Host: http://192.168.10.129:8080");
+  client.println("Host: "+ host);
   client.println("Content-Type: application/json");
   client.println("Content-Length: " + String(jsonString.length()));
   client.println(); 
