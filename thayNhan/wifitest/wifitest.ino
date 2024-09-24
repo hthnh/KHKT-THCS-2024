@@ -15,7 +15,7 @@ int status = WL_IDLE_STATUS;
 int id;
 String local;
 int sensor_A = A5;
-int warnPoint = 300;
+int warnPoint = 45;
 
 
 ArduinoLEDMatrix matrix;
@@ -109,6 +109,7 @@ void setup(){
   local = doc["local"].as<String>();
 
   client.stop();
+  
 }
 
 
@@ -228,12 +229,19 @@ void read_response() {
     client.stop();
 }
 
+void startup(){
+  for(int i = 0; i <50; i++){
+    int value1 = analogRead(sensor_A);
+    int value2 = analogRead(sensor_B);
+  }
+}
+
 
 void loop() {
-
-  int value = analogRead(sensor_A);
-  Serial.println(value);
-  while(value > warnPoint){
+  startup();
+  int value1 = analogRead(sensor_A);
+  int value2 = analogRead(sensor_B);
+  while((value1+value2)/2 > warnPoint){
     post_warning();
     if(resp_code() == 201) break;
     else {
@@ -243,7 +251,7 @@ void loop() {
     
   }
 
-  // delay(10000);
+  delay(10000);
 
   // while(true){
   //   post_warning();
