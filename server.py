@@ -29,7 +29,7 @@ nextArClientId = max(client['id'] for client in ArClients) + 1 if ArClients else
 nextWarnNo = max(client['No'] for client in WarFile) + 1 if WarFile else 1
 
 
-def record_video(record_duration=10):
+def record_video(record_duration):
     cap = None
     out = None
     try:
@@ -199,5 +199,5 @@ if __name__ == '__main__':
     WarFile = load_data(WarningHistory_file)
     nextArClientId = max(client['id'] for client in ArClients) + 1 if ArClients else 1
     nextWarnNo = max(client['No'] for client in WarFile) + 1 if WarFile else 1
-    app.run(host = "192.168.10.129",port=8080)
+    app.run(host = "192.168.1.2",port=8080)
 

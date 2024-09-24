@@ -3,19 +3,19 @@
 #include "Arduino_LED_Matrix.h"
 #include "ArduinoJson.h"
 
-#define ssid "hthnh"
-#define pass "hthnh123"
+#define ssid "hth"
+#define pass "haithinh"
 
-const char* host = "192.168.10.129";
-IPAddress server(192,168,10,129);
-IPAddress local_IP(192,168,10,80);
-IPAddress gateway(192,168,10,1);
+const char* host = "192.168.1.2";
+IPAddress server(192,168,1,2);
+IPAddress local_IP(192,168,1,80);
+IPAddress gateway(192,168,1,1);
 IPAddress subnet(255,255,255,0);
 int status = WL_IDLE_STATUS;
 int id;
 String local;
 int sensor_A = A5;
-int warnPoint = 30;
+int warnPoint = 300;
 
 
 ArduinoLEDMatrix matrix;
@@ -232,6 +232,7 @@ void read_response() {
 void loop() {
 
   int value = analogRead(sensor_A);
+  Serial.println(value);
   while(value > warnPoint){
     post_warning();
     if(resp_code() == 201) break;
