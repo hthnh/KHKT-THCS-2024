@@ -3,7 +3,7 @@ import requests
 url = 'http://192.168.10.129:8080/Warning'
 data = {
     'No': '',
-    'Local': 'toilet3',
+    'Local': 'toilet2',
     'From' : '001',
     'Time' : '7:09PM',
     'Date' : '18/09/2006'

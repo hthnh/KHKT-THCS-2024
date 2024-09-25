@@ -5,11 +5,12 @@ import os
 from datetime import datetime
 import time
 from telegram import Bot
+import asyncio
 
-Token_bot = "7284069938:AAEzY6BpHskyexgtlpmCCW1BZQR7SPl7FEg"
-Chat_id = "6776867686"
+TOKEN = "7284069938:AAEzY6BpHskyexgtlpmCCW1BZQR7SPl7FEg"
+CHAT_ID = "-1002224260097"
 app = Flask(__name__)
-bot = Bot(token=Token_bot)
+bot = Bot(token=TOKEN)
 
 Client_data_file = 'clients.json'
 WarningHistory_file = "warning.json"
@@ -31,10 +32,19 @@ WarFile = load_data(WarningHistory_file)
 nextArClientId = max(client['id'] for client in ArClients) + 1 if ArClients else 1
 nextWarnNo = max(client['No'] for client in WarFile) + 1 if WarFile else 1
 
+async def send_message(chat):
+    bot = Bot(token=TOKEN)
+    await bot.send_message(chat_id=CHAT_ID, text=chat)
 
-def send_message(chat){
-    bot.send_message(chat_id=Chat_id, text = chat)
-}
+def send_message_sync(chat):
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:  # Nếu không có event loop trong thread hiện tại
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(send_message(chat))
+
 
 def record_video(record_duration):
     cap = None
@@ -169,8 +179,11 @@ def start():
     Warn['Date'] = datetime.now().strftime('%d-%m-%Y')
     nextWarnNo+=1
     WarFile.append(Warn)
+
     save_data(WarningHistory_file,WarFile)
-    send_message("Phat hien hut thuoc tai phong: " + Warn['Local'])
+
+    send_message_sync("Phat hien hut thuoc tai phong: " + Warn['Local'])
+
     record_video(record_duration=10)
     return '', 201, {'location': f'/WarFile/{Warn["No"]}'}
 
@@ -207,5 +220,5 @@ if __name__ == '__main__':
     WarFile = load_data(WarningHistory_file)
     nextArClientId = max(client['id'] for client in ArClients) + 1 if ArClients else 1
     nextWarnNo = max(client['No'] for client in WarFile) + 1 if WarFile else 1
-    app.run(host = "192.168.1.2",port=8080)
+    app.run(host = "192.168.10.129",port=8080)
 
