@@ -6,7 +6,7 @@ import os
 # Configuration
 SERIAL_PORT = '/dev/ttyACM0'  # Replace with your Arduino's serial port (e.g., '/dev/ttyACM0' or '/dev/ttyUSB0')
 BAUD_RATE = 9600
-CSV_FILE = 'data.csv'
+CSV_FILE = 'noSmokeData.csv'
 
 def find_serial_port():
     """Function to help find the correct serial port."""
@@ -37,7 +37,7 @@ def main():
     if not os.path.isfile(CSV_FILE):
         with open(CSV_FILE, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["Timestamp", "MQ7_Value", "Temperature_C", "Humidity_%"])
+            writer.writerow(["Timestamp", "MQ7_Value", "VOC_Value", "Temperature_C", "Humidity_%", "Smoke"])
         print(f"Created new CSV file: {CSV_FILE}")
     else:
         print(f"Appending to existing CSV file: {CSV_FILE}")
