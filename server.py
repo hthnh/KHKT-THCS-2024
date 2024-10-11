@@ -4,7 +4,7 @@ import cv2
 import os
 from datetime import datetime
 import time
-from telegram import Bot
+from telegram import Bot # type: ignore
 import asyncio
 
 TOKEN = "7284069938:AAEzY6BpHskyexgtlpmCCW1BZQR7SPl7FEg"
