@@ -1,49 +1,77 @@
 #include <WiFiS3.h>
+#include <Wire.h>
+#include "AHT20.h"
 #include "ArduinoGraphics.h"
 #include "Arduino_LED_Matrix.h"
 #include "ArduinoJson.h"
 
-#define ssid "hth"
-#define pass "haithinh"
+// Define wifi
+#define ssid "hthnh"
+#define pass "hthnh123"
+// Define pin
+#define MQ7_PIN A0
+#define VOC_PIN A1
+//initialize AHT20
+AHT20 aht20;
 
-const char* host = "http://192.168.1.2:8080";
-IPAddress server(192,168,1,2);
-IPAddress local_IP(192,168,1,80);
-IPAddress gateway(192,168,1,1);
+// client config
+const char* host = "http://192.168.10.129:8080";
+IPAddress server(192,168,10,129);
+IPAddress local_IP(192,168,10,80);
+IPAddress gateway(192,168,10,1);
 IPAddress subnet(255,255,255,0);
 int status = WL_IDLE_STATUS;
-int id;
 String local;
-int sensor_A = A5;
-int sensor_B = A4;
-int warnPoint = 45;
-
-
-ArduinoLEDMatrix matrix;
 WiFiClient client;
+int id;
+// define store variable
+int mq7Value;
+int vocValue;
+int temperature;
+int humidity;
+
+
+// led matrix 
+ArduinoLEDMatrix matrix;
 
 
 void setup(){
   delay(5000);
   Serial.begin(9600);
   while(!Serial){
-    delay(5000);
+    delay(500);
   }
   matrix.begin();
-  printLedMatrix("    Start");
+  printLedMatrix("    Start  ");
   
+
+  Wire.begin();
+
+  if (aht20.begin()) {
+    Serial.println("AHT20 sensor initialized successfully.");
+  } else {
+    Serial.println("ERROR: Failed to initialize AHT20 sensor!");
+    while (1) printLedMatrix("  121  "); // Stop execution
+  }
+  if (aht20.available() == true){
+    Serial.println("ERROR: Failed to initialize AHT20 sensor!");
+    while (1) printLedMatrix("  121  "); // Stop execution
+  }
+
 
 
   if (WiFi.status() == WL_NO_MODULE) {
     Serial.println("Communication with WiFi module failed!");
-    printLedMatrix("error");
-    while (true);
+    printLedMatrix("error ");
+    while (true){
+      printLedMatrix("  101  ");
+    }
   }
   
   String fv = WiFi.firmwareVersion();
   if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
     Serial.println("Please upgrade the firmware");
-    printLedMatrix("error");
+    printLedMatrix("  error 002  ");
 
   }
   WiFi.config(local_IP, gateway, subnet);
@@ -51,7 +79,7 @@ void setup(){
   
   while (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
-    printLedMatrix("   waiting for wifi");
+    printLedMatrix("   waiting for wifi  ");
     Serial.println(ssid);
     status = WiFi.begin(ssid, pass);
      
@@ -72,15 +100,16 @@ void setup(){
     client.println("");
     client.println("Connection: close");
   }else{
-    printLedMatrix(" error");
+    printLedMatrix(" error ");
     Serial.println("error get reg");
-    while(true);
+    while(true) printLedMatrix("  111  ");
+    
   }
 
   if(resp_code() == 404){
     printLedMatrix(" error");
     Serial.println(" New Register");
-    while(true);
+    while(true) printLedMatrix("  112  ");
   }
 
 
@@ -91,6 +120,8 @@ void setup(){
       break;
     }
   }
+
+  delay(2000);
 
   // Read the response body
   String response = "";
@@ -104,6 +135,8 @@ void setup(){
   if (error) {
     Serial.print("Failed to parse JSON: ");
     Serial.println(error.c_str());
+    printLedMatrix(" error ");
+    while(true) printLedMatrix("  113  ");
   }
 
   id = doc["id"];
@@ -111,6 +144,7 @@ void setup(){
 
   client.stop();
   
+
 }
 
 
@@ -164,16 +198,6 @@ void printWifiStatus() {
 
 
 
-// void get_data(){
-//   printLedMatrix("   Register Sensor");
-//   if(client.connect(server,8080))
-//   Serial.println("connected get value");
-//   client.println("GET / HTTP/1.1");
-//   client.println("");
-//   client.println("Connection: close");
-
-// }
-
 void post_warning(){
   if(client.connect(server,8080))
   Serial.println("connected post value");
@@ -181,33 +205,52 @@ void post_warning(){
   String url = "/Warning";
   String data = "{\"No\":\"\",\"Local\":\""+ local +"\",\"From\":"+ id +", \"Time\":\"\", \"Date\":\"\"}";
 
-  DynamicJsonDocument jsonDoc(1024);  // Adjust size as needed
-  jsonDoc["No"] = "";  // Replace with your data
-  jsonDoc["Local"] = local;       // Replace with your data
-  jsonDoc["From"] = id;       // Replace with your data
-  jsonDoc["Time"] = "";       // Replace with your data
-  jsonDoc["Date"] = "";       // Replace with your data
+  DynamicJsonDocument jsonDoc(1024); 
+  jsonDoc["No"] = "";  
+  jsonDoc["Local"] = local;       
+  jsonDoc["From"] = id;       
+  jsonDoc["Time"] = "";       
+  jsonDoc["Date"] = "";       
   String jsonString;
   serializeJson(jsonDoc, jsonString);
 
-  // // Build the HTTP POST request
-  // client.print(String("POST ") + url + " HTTP/1.1\r\n" +
-  //              "Host: " + host + "\r\n" +
-  //              "Content-Type: application/x-www-form-urlencoded\r\n" +
-  //              "Content-Length: " + data.length() + "\r\n" +
-  //              "Connection: close\r\n\r\n" +
-  //              data + "\r\n");
-  
 
   client.println("POST /Warning HTTP/1.1");
-  client.println("Host: "+ host);
+  client.println(String("Host: ")+ host);
   client.println("Content-Type: application/json");
   client.println("Content-Length: " + String(jsonString.length()));
   client.println(); 
   client.println(jsonString);  // Send JSON data
   client.println("Connection: close");
 
+}
 
+
+
+void post_data(int Co, int Voc, int Temp, int Hum){
+  if(client.connect(server,8080))
+  Serial.println("connected post value");
+
+  // Prepare data request
+
+  DynamicJsonDocument jsonDoc(1024); 
+  jsonDoc["ID"] = id;
+  jsonDoc["Co"] = Co;       
+  jsonDoc["VOC"] = Voc;       
+  jsonDoc["Temp"] = Temp;       
+  jsonDoc["Hum"] = Hum;       
+  String jsonString;
+  serializeJson(jsonDoc, jsonString);
+
+  // Prepare HTTP POST request
+
+  client.println("POST /ReceiveData HTTP/1.1");
+  client.println(String("Host: ")+ host);
+  client.println("Content-Type: application/json");
+  client.println("Content-Length: " + String(jsonString.length()));
+  client.println(); 
+  client.println(jsonString);  // Send JSON data
+  client.println("Connection: close");
 
 }
 
@@ -230,42 +273,32 @@ void read_response() {
     client.stop();
 }
 
-void startup(){
-  for(int i = 0; i <50; i++){
-    int value1 = analogRead(sensor_A);
-    int value2 = analogRead(sensor_B);
-  }
+
+void get_sensor_value(){
+  mq7Value = analogRead(MQ7_PIN);
+  vocValue = analogRead(VOC_PIN);
+  temperature = aht20.getTemperature();
+  humidity = aht20.getHumidity();
 }
 
 
-void loop() {
-  startup();
-  int value1 = analogRead(sensor_A);
-  int value2 = analogRead(sensor_B);
-  while((value1+value2)/2 > warnPoint){
-    post_warning();
-    if(resp_code() == 201) break;
-    else {
-      Serial.println("Post error");
-      printLedMatrix("   error");
-    }
-    
+void loop(){
+if( resp_code() == 301){
+  post_warning();
+}else{
+  int totalCo = 0;
+  int totalVoc = 0;
+  int totalTemp = 0;
+  int totalHum = 0;
+  for(int i = 0; i < 5; i++){
+    get_sensor_value();
+    totalCo += mq7Value;
+    totalVoc += vocValue;
+    totalTemp += temperature;
+    totalHum += humidity;
+    delay(1000);
   }
-
-  delay(10000);
-
-  // while(true){
-  //   post_warning();
-  //   Serial.println(resp_code());
-  //   if(resp_code() == 201) break;
-  //   else {
-  //     Serial.println("Post error");
-  //     printLedMatrix("   error");
-
-  //   }
-    
-  // }
-
-
-  
+  post_data(totalCo / 5, totalVoc / 5, totalTemp / 5, totalHum / 5);
+  }
 }
+

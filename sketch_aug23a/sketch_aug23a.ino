@@ -21,15 +21,6 @@ const long interval = 1000; // Interval at which to send data (milliseconds)
 void setup() {
   // Initialize serial communication
   Serial.begin(9600);
-
-}
-
-
-void loop(){
-  int value = analogRead(a0);
-  Serial.println(value);  
-  delay(500);
-}
   
   // Initialize I2C communication for AHT20
   Wire.begin();

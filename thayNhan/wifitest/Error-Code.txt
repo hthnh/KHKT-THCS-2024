@@ -1,0 +1,16 @@
+xyz : 
+ - X :
+    - 0: Warning
+    - 1: Error
+ - Y :
+    - 0: Network
+    - 1: Server
+    - 2: Sensor
+
+
+101 : No wifi module
+002 : Wifi firmware not up-to-date
+111 : Can not connected to server
+112 : Not found client on Server
+113 : Bad response 
+121 : AHT20 failed

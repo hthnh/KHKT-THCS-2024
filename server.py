@@ -6,11 +6,17 @@ from datetime import datetime
 import time
 from telegram import Bot # type: ignore
 import asyncio
+import numpy as np
+import joblib
+from tensorflow.keras.models import load_model
+import pandas as pd
 
+ 
 TOKEN = "7284069938:AAEzY6BpHskyexgtlpmCCW1BZQR7SPl7FEg"
 CHAT_ID = "-1002224260097"
 app = Flask(__name__)
 bot = Bot(token=TOKEN)
+base_model = load_model('/home/hthnh/Desktop/project-khkt-thcs/model/base_smoke_model.keras')
 
 Client_data_file = 'clients.json'
 WarningHistory_file = "warning.json"
@@ -186,6 +192,38 @@ def start():
 
     record_video(record_duration=10)
     return '', 201, {'location': f'/WarFile/{Warn["No"]}'}
+
+
+
+@app.route('/ReceiveData', methods=['POST'])
+def As():
+    Data = json.loads(request.data)
+    
+    new_data = pd.DataFrame({
+    'Co': [Data['Co']],
+    'VOC': [Data['VOC']],
+    'Temp': [Data['Temp']],
+    'Hum': [Data['Hum']]
+    })
+    scaler = joblib.load('/home/hthnh/Desktop/project-khkt-thcs/model/scaler.pkl')
+    # Assuming you used a scaler for normalization during training
+    new_data_scaled = scaler.transform(new_data)  # Normalize the new data
+
+    prediction = base_model.predict(new_data_scaled)
+
+    if prediction[0][0] > 0.5:
+        print("Smoke")
+        return '',301
+        pass
+    else:
+        print("No smoke")
+        return '',300
+        pass
+
+
+
+
+
 
 
 @app.route('/ArClients/<int:id>', methods=['PUT'])
