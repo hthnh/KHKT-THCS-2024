@@ -6,8 +6,8 @@
 #include "ArduinoJson.h"
 
 // Define wifi
-#define ssid "hthnh"
-#define pass "hthnh123"
+#define ssid "hth1"
+#define pass "haithinh"
 // Define pin
 #define MQ7_PIN A0
 #define VOC_PIN A1
@@ -15,15 +15,16 @@
 AHT20 aht20;
 
 // client config
-const char* host = "http://192.168.10.129:8080";
-IPAddress server(192,168,10,129);
-IPAddress local_IP(192,168,10,80);
-IPAddress gateway(192,168,10,1);
+const char* host = "http://192.168.23.149:8080";
+IPAddress server(192,168,23,149);
+IPAddress local_IP(192,168,23,80);
+IPAddress gateway(192,168,23,1);
 IPAddress subnet(255,255,255,0);
 int status = WL_IDLE_STATUS;
 String local;
 WiFiClient client;
 int id;
+
 // define store variable
 int mq7Value;
 int vocValue;
@@ -299,6 +300,16 @@ if( resp_code() == 301){
     delay(1000);
   }
   post_data(totalCo / 5, totalVoc / 5, totalTemp / 5, totalHum / 5);
+  Serial.print(totalCo / 5);
+  Serial.print(", ");
+  Serial.print(totalVoc / 5);
+  Serial.print(", ");
+
+  Serial.print(totalTemp / 5);
+  Serial.print(", ");
+
+  Serial.println(totalHum / 5);
   }
+  
 }
 

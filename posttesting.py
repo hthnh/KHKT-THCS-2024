@@ -1,12 +1,12 @@
 import requests
 
-url = 'http://192.168.10.129:8080/Warning'
+url = 'http://192.168.23.149:8080/ReceiveData'
 data = {
-    'No': '',
-    'Local': 'toilet2',
-    'From' : '001',
-    'Time' : '7:09PM',
-    'Date' : '18/09/2006'
+    'ID': '1',
+    'Co': '40',
+    'VOC' : '500',
+    'Temp' : '31',
+    'Hum' : '61'
 }
 
 response = requests.post(url, json=data)  # For JSON data
