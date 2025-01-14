@@ -258,5 +258,5 @@ if __name__ == '__main__':
     WarFile = load_data(WarningHistory_file)
     nextArClientId = max(client['id'] for client in ArClients) + 1 if ArClients else 1
     nextWarnNo = max(client['No'] for client in WarFile) + 1 if WarFile else 1
-    app.run(host = "192.168.23.149",port=8080)
+    app.run(host = "172.16.86.233",port=8080)
 

@@ -6,8 +6,8 @@
 #include "ArduinoJson.h"
 
 // Define wifi
-#define ssid "hth1"
-#define pass "haithinh"
+#define ssid "CONCUABAME"
+#define pass "00000000"
 // Define pin
 #define MQ7_PIN A0
 #define VOC_PIN A1
@@ -15,10 +15,10 @@
 AHT20 aht20;
 
 // client config
-const char* host = "http://192.168.23.149:8080";
-IPAddress server(192,168,23,149);
-IPAddress local_IP(192,168,23,80);
-IPAddress gateway(192,168,23,1);
+const char* host = "http://192.168.1.22:8080";
+IPAddress server(192,168,196,15);
+IPAddress local_IP(192,168,196,80);
+IPAddress gateway(192,168,1,1);
 IPAddress subnet(255,255,255,0);
 int status = WL_IDLE_STATUS;
 String local;
@@ -38,6 +38,9 @@ ArduinoLEDMatrix matrix;
 
 void setup(){
   delay(5000);
+  pinMode(1, INPUT);
+  pinMode(2, INPUT);
+  pinMode(3, OUTPUT);
   Serial.begin(9600);
   while(!Serial){
     delay(500);
@@ -282,24 +285,32 @@ void get_sensor_value(){
   humidity = aht20.getHumidity();
 }
 
-
-void loop(){
-if( resp_code() == 301){
+void main_func(){
+  if( resp_code() == 301){
+  fan();
   post_warning();
 }else{
   int totalCo = 0;
   int totalVoc = 0;
   int totalTemp = 0;
   int totalHum = 0;
+  fan();
+
   for(int i = 0; i < 5; i++){
     get_sensor_value();
     totalCo += mq7Value;
     totalVoc += vocValue;
     totalTemp += temperature;
     totalHum += humidity;
+  fan();
+
     delay(1000);
   }
+  fan();
+
   post_data(totalCo / 5, totalVoc / 5, totalTemp / 5, totalHum / 5);
+  fan();
+
   Serial.print(totalCo / 5);
   Serial.print(", ");
   Serial.print(totalVoc / 5);
@@ -310,6 +321,23 @@ if( resp_code() == 301){
 
   Serial.println(totalHum / 5);
   }
+}
+void fan(){
+  if(digitalRead(1) == 0){
+    digitalWrite(3,HIGH);
+    delay(1500);
+  }
+
+  if(digitalRead(2) == 0){
+    digitalWrite(3,LOW);
+    delay(1500);
+  }
   
+}
+
+void loop(){
+  fan();
+  main_func();
+
 }
 
