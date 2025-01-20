@@ -6,8 +6,8 @@
 #include "ArduinoJson.h"
 
 // Define wifi
-#define ssid "CONCUABAME"
-#define pass "00000000"
+#define ssid "NGUOIVIETGOCCAY"
+#define pass "12345678"
 // Define pin
 #define MQ7_PIN A0
 #define VOC_PIN A1
@@ -15,10 +15,10 @@
 AHT20 aht20;
 
 // client config
-const char* host = "http://192.168.1.22:8080";
-IPAddress server(192,168,196,15);
-IPAddress local_IP(192,168,196,80);
-IPAddress gateway(192,168,1,1);
+const char* host = "http://192.168.69.15:8080";
+IPAddress server(192,168,69,15);
+IPAddress local_IP(192,168,69,80);
+IPAddress gateway(192,168,69,255);
 IPAddress subnet(255,255,255,0);
 int status = WL_IDLE_STATUS;
 String local;
@@ -54,10 +54,6 @@ void setup(){
   if (aht20.begin()) {
     Serial.println("AHT20 sensor initialized successfully.");
   } else {
-    Serial.println("ERROR: Failed to initialize AHT20 sensor!");
-    while (1) printLedMatrix("  121  "); // Stop execution
-  }
-  if (aht20.available() == true){
     Serial.println("ERROR: Failed to initialize AHT20 sensor!");
     while (1) printLedMatrix("  121  "); // Stop execution
   }

@@ -205,6 +205,7 @@ def As():
     'Temp': [Data['Temp']],
     'Hum': [Data['Hum']]
     })
+    print(new_data)
     scaler = joblib.load('/home/hthnh/Desktop/project-khkt-thcs/model/scaler.pkl')
     # Assuming you used a scaler for normalization during training
     new_data_scaled = scaler.transform(new_data)  # Normalize the new data
@@ -257,6 +258,7 @@ if __name__ == '__main__':
     ArClients = load_data(Client_data_file)
     WarFile = load_data(WarningHistory_file)
     nextArClientId = max(client['id'] for client in ArClients) + 1 if ArClients else 1
-    nextWarnNo = max(client['No'] for client in WarFile) + 1 if WarFile else 1
-    app.run(host = "172.16.86.233",port=8080)
+    nextWarnNo = max(client['No'] 
+    for client in WarFile) + 1 if WarFile else 1
+    app.run(host = "192.168.69.15",port=8080)
 

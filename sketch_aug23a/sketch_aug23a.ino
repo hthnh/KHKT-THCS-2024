@@ -26,16 +26,13 @@ void setup() {
   Wire.begin();
   
   // Initialize AHT20 sensor
-  if (aht20.begin()) {
-    Serial.println("AHT20 sensor initialized successfully.");
-  } else {
-    Serial.println("ERROR: Failed to initialize AHT20 sensor!");
-    while (1); // Stop execution
-  }
-  if (aht20.available() == true){
-    Serial.println("ERROR: Failed to initialize AHT20 sensor!");
-    while (1); // Stop execution
-  }
+  // if (aht20.begin()) {
+  //   Serial.println("AHT20 sensor initialized successfully.");
+  // } else {
+  //   Serial.println("ERROR: Failed to initialize AHT20 sensor!");
+  //   while (1); // Stop execution
+  // }
+  
 
   // Allow sensors to stabilize
   delay(2000); // 2 seconds
